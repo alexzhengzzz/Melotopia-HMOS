@@ -1,6 +1,6 @@
 # Melotopia 🎧
 
-✨ 鸿蒙原生音乐播放器 | 🚀 全场景设备适配
+### ✨ 鸿蒙原生音乐播放器 | 🚀 全场景设备适配
 
 **本项目为第三方应用, 应用本身不提供在线服务, 仅提供UI界面**
 
@@ -32,11 +32,11 @@ git clone https://github.com/Chenlvin/Melotopia-HMOS
 
 #### 侧载安装
 
-[Releases](https://github.com/Chenlvin/Melotopia-HMOS/releases)
+[ >> Releases](https://github.com/Chenlvin/Melotopia-HMOS/releases)
 
 ---
 
-## 可能出现的问题
+## 🔧 可能出现的问题
 
 #### 调试或运行出现“9568289 - install failed due to grant request permissions failed”
 
@@ -60,6 +60,7 @@ git clone https://github.com/Chenlvin/Melotopia-HMOS
         },
 ````
 
+---
 
 ## ⚠️ 免责声明
 
@@ -68,15 +69,23 @@ git clone https://github.com/Chenlvin/Melotopia-HMOS
 > 2. 在线功能需用户**自行搭建合规服务**，由此产生的版权问题与开发者无关
 > 3. 禁止将本项目用于商业用途或二次分发受版权保护的内容
 
+---
 
+## 📧 联系邮箱
 
-## 联系邮箱
+**Email:** chenlvin126@outlook.com
 
-**📧 邮箱:** chenlvin126@outlook.com
+---
 
+## ✨ 参与贡献
 
+- [@Chenlvin](https://github.com/Chenlvin)
+- [@alexzhengzzz NERV](https://github.com/alexzhengzzz)
+- [@lsbnbdz ShiChao](https://github.com/lsbnbdz)
 
-## 界面预览
+---
+
+## 📱 界面预览
 ### Phone - 手机设备
 |            **发现**            |           **音乐云盘**            |            **播放器**            |
 |:----------------------------:|:-----------------------------:|:-----------------------------:|
