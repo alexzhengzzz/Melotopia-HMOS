@@ -1,0 +1,94 @@
+{
+  "app": {
+    "signingConfigs": [
+      {
+        "name": "default",
+        "type": "HarmonyOS",
+        "material": {
+          "storePassword": "0000001B1FE3A8F8F584D30040BCC24511FFBFB5EB08B6284AF696034C9F665EBB8DBB2397C94F951B95A2",
+          "certpath": "D:/HMOS/Cer/CloudMusic/Key/CloudMusic.cer",
+          "keyAlias": "test",
+          "keyPassword": "0000001B9B493F8630FC0B5B1FF838EC990075C99F355F2C84C581242F6FF58FA62F60656E475F483BE0B7",
+          "profile": "D:/HMOS/Cer/CloudMusic/Key/cloudmusicRelease.p7b",
+          "signAlg": "SHA256withECDSA",
+          "storeFile": "D:/HMOS/Cer/CloudMusic/Key/CloudMusic.p12"
+        }
+      },
+      {
+        "name": "cc",
+        "type": "HarmonyOS",
+        "material": {
+          "certpath": "C:\\Users\\zcy01\\.ohos\\config\\cc_CloudMusic-HMOS_49Cx5ZkdoyjQADe6JwU6Rz-R50i5AkaXO1mOEwbzolc=.cer",
+          "keyAlias": "debugKey",
+          "keyPassword": "0000001A7CC5C9F615A7CA9E1AAADB50A02CF9D94E801DA1DAF9014B73D8A2086871E28689B2A8E2FE1E",
+          "profile": "C:\\Users\\zcy01\\.ohos\\config\\cc_CloudMusic-HMOS_49Cx5ZkdoyjQADe6JwU6Rz-R50i5AkaXO1mOEwbzolc=.p7b",
+          "signAlg": "SHA256withECDSA",
+          "storeFile": "C:\\Users\\zcy01\\.ohos\\config\\cc_CloudMusic-HMOS_49Cx5ZkdoyjQADe6JwU6Rz-R50i5AkaXO1mOEwbzolc=.p12",
+          "storePassword": "0000001AD3082165B0DC0A88714D0564B5D89A193BA54564FD9978F5CDAC6DE997502F5FEF48A2AE2851"
+        }
+      },
+      {
+        "name": "hicar",
+        "type": "HarmonyOS",
+        "material": {
+          "certpath": "C:\\Users\\zcy01\\.ohos\\config\\hicar_CloudMusic-HMOS_49Cx5ZkdoyjQADe6JwU6Rz-R50i5AkaXO1mOEwbzolc=.cer",
+          "keyAlias": "debugKey",
+          "keyPassword": "0000001ABFB05085F1FEA8741BA1EAD8A5DFF8E08D0EE07D18FF06A33CFD259110A9644BDD4329953656",
+          "profile": "C:\\Users\\zcy01\\.ohos\\config\\hicar_CloudMusic-HMOS_49Cx5ZkdoyjQADe6JwU6Rz-R50i5AkaXO1mOEwbzolc=.p7b",
+          "signAlg": "SHA256withECDSA",
+          "storeFile": "C:\\Users\\zcy01\\.ohos\\config\\hicar_CloudMusic-HMOS_49Cx5ZkdoyjQADe6JwU6Rz-R50i5AkaXO1mOEwbzolc=.p12",
+          "storePassword": "0000001A2B092C2C6DBF73AB972FF9F399373A051882E1FF9496DFBE744BE3B523B60CA21D6BD6CF8D19"
+        }
+      },
+      {
+        "name": "Melotopia",
+        "type": "HarmonyOS",
+        "material": {
+          "certpath": "C:\\Users\\zcy01\\.ohos\\config\\Melotopia_CloudMusic-HMOS_49Cx5ZkdoyjQADe6JwU6Rz-R50i5AkaXO1mOEwbzolc=.cer",
+          "keyAlias": "debugKey",
+          "keyPassword": "0000001B90C6F791B521AC7DD8295924F4DEFDD7D76533CED64E36CEC25A88AA5D0F706A6D8119551B3B22",
+          "profile": "C:\\Users\\zcy01\\.ohos\\config\\Melotopia_CloudMusic-HMOS_49Cx5ZkdoyjQADe6JwU6Rz-R50i5AkaXO1mOEwbzolc=.p7b",
+          "signAlg": "SHA256withECDSA",
+          "storeFile": "C:\\Users\\zcy01\\.ohos\\config\\Melotopia_CloudMusic-HMOS_49Cx5ZkdoyjQADe6JwU6Rz-R50i5AkaXO1mOEwbzolc=.p12",
+          "storePassword": "0000001B914488CF9847AD91224014DF17F05195C9AA72E15096CD5C9E27C70795C8DCB4DBB5E9D3894A63"
+        }
+      }
+    ],
+    "products": [
+      {
+        "name": "default",
+        "signingConfig": "Melotopia",
+        "compatibleSdkVersion": "5.0.4(16)",
+        "runtimeOS": "HarmonyOS",
+        "buildOption": {
+          "strictMode": {
+            "caseSensitiveCheck": true,
+            "useNormalizedOHMUrl": true
+          }
+        }
+      }
+    ],
+    "buildModeSet": [
+      {
+        "name": "debug",
+      },
+      {
+        "name": "release"
+      }
+    ]
+  },
+  "modules": [
+    {
+      "name": "entry",
+      "srcPath": "./entry",
+      "targets": [
+        {
+          "name": "default",
+          "applyToProducts": [
+            "default"
+          ]
+        }
+      ]
+    }
+  ]
+}
