@@ -96,16 +96,20 @@ class FileUtils {
     }
   }
 
-  async saveFile(localSongs: LocalSong[]) {
+  async saveFile(localSongs: LocalSong[], type: 'song' | 'lyric' = 'song') {
     try {
       let filePicker = new picker.DocumentViewPicker()
       let saveOption = new picker.DocumentSaveOptions()
-      saveOption.newFileNames = localSongs.map(song => song.songFile)
-
+      if(type === 'song') saveOption.newFileNames = localSongs.map(song => song.songFile)
+      else saveOption.newFileNames = localSongs.map(song => `${song.songFile.replace(/\.[^.]+$/, '')}.lrc`)
       filePicker.save(saveOption).then((uris) => {
         uris.forEach(async (uri, index) => {
           try {
-            let srcPath = this.filesDir + `/${localSongs[index].songFile}`
+            let fileName: string = type === 'song'
+            ? `/${localSongs[index].songFile}`
+              : `/lyric/${localSongs[index].songId}.lrc`
+
+            let srcPath = this.filesDir + fileName
             let descFile = fs.openSync(uri, fs.OpenMode.READ_WRITE | fs.OpenMode.CREATE)
             await fs.copyFile(srcPath, descFile.fd)
             fs.closeSync(descFile.fd)

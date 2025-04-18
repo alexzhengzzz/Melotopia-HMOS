@@ -15,7 +15,7 @@ export struct FileCardClickMenu {
   @Prop artistsString: string = ''
   @Link showMatchSheet: boolean
 
-  private handlePlay = async () => {
+  private handlePlay = async (immediately: boolean = true) => {
     try {
       const rootUrl = FileUtils.getFilesDir()
       const fileUrl = rootUrl + `/${this.localSong.songFile}`
@@ -37,7 +37,9 @@ export struct FileCardClickMenu {
         fee: 0
       }
       PlayQueueUtils.queueAdd(0, song, this.artistsString, this.localSong.songFile)
-      playQueue(PlayQueueUtils.currentQueueIndex + 1)
+      if(immediately) {
+        playQueue(PlayQueueUtils.currentQueueIndex + 1)
+      }
     } catch (e) {
       LogUtil.error('Play local song error: ' + e.message)
       ToastUtil.showToast('播放失败')
@@ -72,22 +74,27 @@ export struct FileCardClickMenu {
           PasteboardUtil.setDataText(`${this.localSong.name}`)
           ToastUtil.showToast('已复制歌名至剪切板')
         })
-      MenuItem(this.MenuItem($r('app.media.ic_play_fill'), '播放', $r('app.color.reverse')))
-        .onClick(this.handlePlay)
+
+      MenuItem(this.MenuItem($r('app.media.ic_public_add_filled'), '下一首播放', $r('app.color.reverse')))
+        .onClick(() => this.handlePlay(false))
+
+      MenuItem(this.MenuItem($r('app.media.ic_play_fill'), '立即播放', $r('app.color.reverse')))
+        .onClick(() => this.handlePlay(true))
 
       MenuItem(this.MenuItem($r('app.media.ic_public_search_filled'), '匹配歌曲'))
         .onClick(() => {
           this.showMatchSheet = true
         })
 
-      MenuItem(this.MenuItem($r('app.media.ic_public_folder_filled'), '保存歌曲至本地'))
+      MenuItem(this.MenuItem($r('app.media.ic_public_folder_filled'), '导出音频文件'))
         .onClick(() => {
           FileUtils.saveFile([this.localSong])
         })
 
-      MenuItem(this.MenuItem($r('app.media.ic_public_app_filled'), '文件预览'))
+      MenuItem(this.MenuItem($r('app.media.ic_music_fill'), '导出歌词文件'))
+        .visibility(this.localSong.songId > 0 ? Visibility.Visible : Visibility.None)
         .onClick(() => {
-          FileUtils.previewFile(this.localSong.songFile)
+          FileUtils.saveFile([this.localSong], 'lyric')
         })
 
       MenuItem(this.MenuItem($r('app.media.ic_public_delete_filled'), '删除歌曲', $r('app.color.app_red')))
