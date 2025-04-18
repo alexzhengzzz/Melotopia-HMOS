@@ -49,61 +49,60 @@ export struct LyricComponent {
   }
 
   build() {
-    Stack() {
-      List({ scroller: this.scroller, space: this.lyricStyle.size / 1.5 }) {
-        ForEach(this.lyric, (item: Lyric, index) => {
-          ListItem() {
-            LyricLine({
-              lyricStyle: this.lyricStyle,
-              currentLyricIndex: this.currentLyricIndex,
-              userScrolling: this.userScrolling,
-              index: index,
-              item: item
-            })
-          }
-          .offset({ y: this.Offset(index) })
-          .animation(this.userScrolling ? { } : {
-            delay: this.Delay(index),
-            duration: (this.currentLyricIndex > index ? 300 : 500),
-            curve: Curve.Smooth,
-            expectedFrameRateRange: {
-              expected: 120,
-              min: 60,
-              max: 120
-            }
+    List({ scroller: this.scroller }) {
+      ForEach(this.lyric, (item: Lyric, index) => {
+        ListItem() {
+          LyricLine({
+            lyricStyle: this.lyricStyle,
+            currentLyricIndex: this.currentLyricIndex,
+            userScrolling: this.userScrolling,
+            index: index,
+            item: item
           })
-        })
-      }
-      .cachedCount(50)
-      .padding({ top: 30 })
-      .width('100%')
-      .height('100%')
-      .edgeEffect(EdgeEffect.None)
-      .scrollSnapAlign(ScrollSnapAlign.CENTER)
-      .listDirection(Axis.Vertical)
-      .cachedCount(20)
-      .scrollBar(BarState.Off)
-      .fadingEdge(true, {
-        fadingEdgeLength: {
-          unit: LengthUnit.PERCENT,
-          value: 40
         }
-      })
-      .onTouch(() => {
-        this.userScrolling = 2
+        .offset({ y: this.Offset(index) })
+        .padding({ top: this.lyricStyle.size / 2, bottom: this.lyricStyle.size / 2 })
+        .animation(this.userScrolling ? { } : {
+          delay: this.Delay(index),
+          duration: (this.currentLyricIndex > index ? 300 : 500),
+          curve: Curve.Smooth,
+          expectedFrameRateRange: {
+            expected: 120,
+            min: 60,
+            max: 120
+          }
+        })
       })
     }
+    .cachedCount(50)
+    .alignListItem(ListItemAlign.End)
+    .padding({ top: 30 })
+    .width('100%')
+    .height('100%')
+    .edgeEffect(EdgeEffect.None)
+    .scrollSnapAlign(ScrollSnapAlign.CENTER)
+    .listDirection(Axis.Vertical)
+    .cachedCount(20)
+    .scrollBar(BarState.Off)
+    .fadingEdge(true, {
+      fadingEdgeLength: {
+        unit: LengthUnit.PERCENT,
+        value: 40
+      }
+    })
+    .onTouch(() => {
+      this.userScrolling = 2
+    })
   }
 
   Offset(index: number) {
-    const LINE_SPACING = this.lyricStyle.size * 1.3
-    const CURRENT_LINE_OFFSET = 0
-
+    const LINE_SPACING = this.lyricStyle.size
     const delta = index - this.currentLyricIndex
-    let offset = CURRENT_LINE_OFFSET
-
-    offset = delta * LINE_SPACING
-
+    let offset = Math.abs(delta) < 6
+      ? delta * LINE_SPACING
+      : delta > 0
+        ? 6 * LINE_SPACING
+        : -6 * LINE_SPACING
     return offset
   }
 
@@ -145,7 +144,7 @@ export struct LyricComponent {
       .padding({ left: 20, right: 20 })
       .onClick(() => {
         this.userScrolling = 0
-        seekMusic(this.item.time)
+        seekMusic(this.item.time + 100)
       })
       .animation(this.userScrolling ? { } : {
         duration: 300,
