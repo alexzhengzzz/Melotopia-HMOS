@@ -49,7 +49,7 @@ export const searchSongs = async (
 ): Promise<SearchReturn> => {
   const response = await commonRequest<SongsData>({
     url: '/search',
-    params: { keywords, offset, limit }
+    params: { keywords, offset, limit, noCookie: true }
   })
 
   let searchReturn: SearchReturn = {

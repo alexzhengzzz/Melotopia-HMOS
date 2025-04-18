@@ -1,7 +1,7 @@
 import { EmitterUtil, FileUtil, LogUtil, RandomUtil, ToastUtil } from "@pura/harmony-utils";
 import { Song, SongItem } from "../../entities/song/Song";
 import FileUtils from "../../utils/file/FileUtils";
-import { getPersonalFmSong, getSongPicUrl, getSongUrl } from "../../../api/songApi";
+import { checkMusic, getPersonalFmSong, getSongPicUrl, getSongUrl } from "../../../api/songApi";
 import { fetchMetadata, getArtists, sanitizeFileName } from "../common/convert";
 import PlayQueueUtils from "../../utils/play/PlayQueueUtils";
 import AVSessionUtils from "../../utils/play/AVSessionUtils";
@@ -27,20 +27,22 @@ const pref = StorageConstants.QUEUE_PREF
 
 export async function playMusicByUrl(song: Song, isLogged: boolean, picUrl: string | ResourceStr = '', mode: number = 1) {
   try {
+    const isAccessible = await checkMusic(song.id)
+    if(!isAccessible) {
+      ToastUtil.showToast('当前歌曲无版权或不可用, 自动播放下一首')
+      playNext()
+    }
     isThisSongLiked(song.id)
     let artists = getArtists(song.artists)
     setPlayData(mode, song, artists)
     let localPath: string = ''
     let tempArtists: string = artists
-    try {
-      if(song.name.length + artists.length >= 103) {
-        try { tempArtists = artists.slice(0, 100 - song.name.length) }
-        catch (e) { artists = '未知' }
-      }
-      localPath = await FileUtils.accessLocalFile(sanitizeFileName(`${tempArtists} - ${song.name}`))
-    } catch (e) {
-      playNext()
+    if(song.name.length + artists.length >= 103) {
+      try { tempArtists = artists.slice(0, 100 - song.name.length) }
+      catch (e) { artists = '未知' }
     }
+
+    localPath = await FileUtils.accessLocalFile(sanitizeFileName(`${tempArtists} - ${song.name}`))
 
     if(localPath != '') { // 是否存在本地文件
       AppStorage.setOrCreate(StorageConstants.PLAY_IS_LOCALFILE, true)
@@ -52,9 +54,7 @@ export async function playMusicByUrl(song: Song, isLogged: boolean, picUrl: stri
       let proxyUrl = await AudioCacheUtils.getProxyUrl(songPlay.data[0].url)
       await AVPlayerUtils.setUrl(proxyUrl ?? songPlay.data[0].url)
     }
-    if(!picUrl) {
-      picUrl = await getSongPicUrl(song.id)
-    }
+    if(!picUrl) picUrl = await getSongPicUrl(song.id)
     setPicUrl(picUrl)
     await LyricUtils.setLyric(song)
     await AVSessionUtils.setMetadata(song, artists, picUrl)
