@@ -27,6 +27,14 @@
     {
       "name": "app_red",
       "value": "#FF6A6A"
+    },
+    {
+      "name": "lyrics_background",
+      "value": "#1A1A1A"
+    },
+    {
+      "name": "lyrics_font",
+      "value": "#E6E6E6"
     }
   ]
 }
