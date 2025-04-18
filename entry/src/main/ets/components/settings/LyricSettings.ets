@@ -4,6 +4,7 @@ import { FloatLyric, FloatLyricItem,
   LyricStyle, LyricStyleItem } from "../../common/entities/local/Settings";
 import { changeSettings } from "../../common/functions/app/settings";
 import WindowUtils from "../../common/utils/system/WindowUtils";
+import { lyricsPipManager } from "../../pages/lyrics/PipLyrics";
 
 @Component
 export struct LyricTranslate {
@@ -101,6 +102,7 @@ export struct SetFloatLyric {
   @State positionY: number = 0
   @State fontCenter: boolean = false
   @State lyricDraggable: boolean = false
+  @StorageProp(StorageConstants.CURRENT_LYRIC) currentLyric: string = ''
 
   aboutToAppear(): void {
     this.isOn = this.floatLyric.on
@@ -117,23 +119,23 @@ export struct SetFloatLyric {
   build() {
     Column({ space: 20 }) {
       ToggleSettingItem({ name: '启用浮动歌词', value: this.isOn,
-        onaction: () => { this.floatLyric.on = true; WindowUtils.createLyricsFloatWindow() },
-        offaction:() => { this.floatLyric.on = false; WindowUtils.destoryLyricFloatWindow() },
+        onaction: () => { this.floatLyric.on = true; lyricsPipManager.startPip() },
+        offaction:() => { this.floatLyric.on = false; lyricsPipManager.stopPip() },
         action: () => { this.updateFloatLyric() }
       })
         .padding({ top: Constants.PADDING_EDGE_DEFAULT })
 
-      ToggleSettingItem({ name: '背景模糊', value: this.bgBlur,
-        action: () => {
-          this.floatLyric.bgBlur = this.bgBlur
-          this.updateFloatLyric()
-        }})
-
-      ToggleSettingItem({ name: '浮动歌词拖动', value: this.lyricDraggable,
-        action: () => {
-          this.floatLyric.touchable = this.lyricDraggable
-          this.updateFloatLyric()
-        }})
+      // ToggleSettingItem({ name: '背景模糊', value: this.bgBlur,
+      //   action: () => {
+      //     this.floatLyric.bgBlur = this.bgBlur
+      //     this.updateFloatLyric()
+      //   }})
+      //
+      // ToggleSettingItem({ name: '浮动歌词拖动', value: this.lyricDraggable,
+      //   action: () => {
+      //     this.floatLyric.touchable = this.lyricDraggable
+      //     this.updateFloatLyric()
+      //   }})
 
       ToggleSettingItem({ name: '浮动歌词居中', value: this.fontCenter,
         onaction: () => { this.floatLyric.align = 'center' },
@@ -144,28 +146,30 @@ export struct SetFloatLyric {
       SliderSettingItem({ name: '浮动歌词字体大小', min: 5, max: 22, targetValue: this.fontsize, changeAction: () => {
         this.floatLyric.size = this.fontsize; this.updateFloatLyric()
       }})
-
-      SliderSettingItem({ name: '浮动歌词宽度', min: 10, max: 100, isPercent: true, targetValue: this.wid, changeAction: () => {
-        this.floatLyric.width = this.wid; this.updateFloatLyric()
-      }})
-
-      SliderSettingItem({ name: '浮动歌词透明度', min: 0.1, max: 1, step: 0.1, targetValue: this.fontopacity, changeAction: () => {
-        this.floatLyric.opacity = this.fontopacity; this.updateFloatLyric()
-      }})
-
-      SliderSettingItem({ name: '上下调节', min: 0, max: 100, step: 0.1, targetValue: this.positionY, changeAction: () => {
-        this.floatLyric.position.y = this.positionY; this.updateFloatLyric()
-      }})
-
-      SliderSettingItem({ name: '左右调节', min: 0, max: 100, step: 0.1, targetValue: this.positionX, changeAction: () => {
-        this.floatLyric.position.x = this.positionX; this.updateFloatLyric()
-      }})
         .padding({ bottom: Constants.PADDING_EDGE_TEXT})
+
+      // SliderSettingItem({ name: '浮动歌词宽度', min: 10, max: 100, isPercent: true, targetValue: this.wid, changeAction: () => {
+      //   this.floatLyric.width = this.wid; this.updateFloatLyric()
+      // }})
+
+      // SliderSettingItem({ name: '浮动歌词透明度', min: 0.1, max: 1, step: 0.1, targetValue: this.fontopacity, changeAction: () => {
+      //   this.floatLyric.opacity = this.fontopacity; this.updateFloatLyric()
+      // }})
+
+      // SliderSettingItem({ name: '上下调节', min: 0, max: 100, step: 0.1, targetValue: this.positionY, changeAction: () => {
+      //   this.floatLyric.position.y = this.positionY; this.updateFloatLyric()
+      // }})
+      //
+      // SliderSettingItem({ name: '左右调节', min: 0, max: 100, step: 0.1, targetValue: this.positionX, changeAction: () => {
+      //   this.floatLyric.position.x = this.positionX; this.updateFloatLyric()
+      // }})
+      //   .padding({ bottom: Constants.PADDING_EDGE_TEXT})
     }
   }
 
-  private updateFloatLyric() {
-    changeSettings(StorageConstants.FLOAT_LYRIC_STYLE, this.floatLyric)
+  private async updateFloatLyric() {
+    await changeSettings(StorageConstants.FLOAT_LYRIC_STYLE, this.floatLyric)
+    lyricsPipManager.updateLyrics(this.currentLyric)
   }
 }
 

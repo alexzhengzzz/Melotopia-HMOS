@@ -19,6 +19,7 @@ class AVPlayerUtils {
   private updateFlag: boolean = false
   private isSeeking: boolean = false
   private errorFlag: boolean = false
+  private pauseFlag: boolean = false
 
   getCurrentTime() {
     return this.avPlayer!.currentTime
@@ -139,9 +140,11 @@ class AVPlayerUtils {
         switch (interruptEvent.hintType) {
           case audio.InterruptHint.INTERRUPT_HINT_PAUSE:
             this.pause()
+            this.pauseFlag = true
             break
           case audio.InterruptHint.INTERRUPT_HINT_STOP:
             this.pause()
+            this.pauseFlag = true
             break
           default:
             break
@@ -149,7 +152,7 @@ class AVPlayerUtils {
       } else if (interruptEvent.forceType === audio.InterruptForceType.INTERRUPT_SHARE) {
         switch (interruptEvent.hintType) {
           case audio.InterruptHint.INTERRUPT_HINT_RESUME:
-            this.play()
+            if(this.pauseFlag) this.play()
             break
           default:
             break

@@ -15,6 +15,7 @@ import { PageMap } from '../common/model/PageMap';
 import WindowUtils from '../common/utils/system/WindowUtils';
 import { FloatLyric, FloatLyricItem } from '../common/entities/local/Settings';
 import { App } from '@kit.ArkUI';
+import { lyricsPipManager } from './lyrics/PipLyrics';
 
 @Entry
 @Component
@@ -58,7 +59,8 @@ struct Index {
 
   onPageShow(): void {
     this.currentHour = new Date().getHours()
-    if(this.floatLyric.on) WindowUtils.createLyricsFloatWindow()
+    // if(this.floatLyric.on) WindowUtils.createLyricsFloatWindow()
+    if(this.floatLyric.on) lyricsPipManager.startPip()
   }
 
   private getDynamicPageIndex(): number {

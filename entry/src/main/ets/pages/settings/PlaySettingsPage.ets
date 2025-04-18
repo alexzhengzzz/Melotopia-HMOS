@@ -79,14 +79,7 @@ function PlaySettings(floatLyricAction: () => void) {
     ListItem() {
       CommonSettingsCard({
         title: '浮动歌词设置',
-        action: async () => {
-          const hasPerm = await PermissionUtil.checkPermissions("ohos.permission.SYSTEM_FLOAT_WINDOW")
-          if(!hasPerm) {
-            ToastUtil.showToast('未获取到悬浮窗权限, 无法使用该功能')
-          } else {
-            floatLyricAction()
-          }
-        }
+        action: floatLyricAction
       })
     }
     .itemStyle()

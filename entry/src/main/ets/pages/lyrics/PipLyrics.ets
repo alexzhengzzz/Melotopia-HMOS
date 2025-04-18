@@ -2,6 +2,8 @@ import { BuilderNode, NodeController, PiPWindow } from '@kit.ArkUI';
 import { BusinessError } from '@kit.BasicServicesKit';
 import { ClickUtil } from '@pura/harmony-utils';
 import { StorageConstants } from '../../common/constants/StorageConstants';
+import { FloatLyric } from '../../common/entities/local/Settings';
+import { changeSettings } from '../../common/functions/app/settings';
 import { pauseMusic, playNext, playPre, playQueue, resumeMusic } from '../../common/functions/play/playControl';
 import playQueueUtils from '../../common/utils/play/PlayQueueUtils';
 
@@ -13,34 +15,36 @@ class Params {
   }
 }
 
+let floatLyricStyle = AppStorage.prop<FloatLyric>(StorageConstants.FLOAT_LYRIC_STYLE)
+
 @Extend(Text)
-function textStyle(size: number) {
-  .fontSize(size)
-  .fontWeight(FontWeight.Bold)
+function textStyle() {
+  .fontSize(floatLyricStyle.get().size)
+  .fontWeight(FontWeight.Bolder)
+  .textAlign(floatLyricStyle.get().align === 'center' ? TextAlign.Center : TextAlign.Start)
   .layoutWeight(1)
   .width('100%')
   .maxLines(1)
-  .fontColor($r('app.color.lyrics_font'))
+  .fontColor($r('app.color.app_red'))
   .textShadow({  // 文字阴影增强
     radius: 2,
-    color: Color.Black,
-    offsetX: 1,
-    offsetY: 1
+    color: $r('app.color.reverse'),
+    offsetX: 2,
+    offsetY: 2
   })
-  .textAlign(TextAlign.Center)
   .padding({ left: 10, right: 10 })
-  .textOverflow({ overflow: TextOverflow.Ellipsis })
+  .textOverflow({ overflow: TextOverflow.MARQUEE })
 }
 
 @Builder
 function buildText(params: Params) {
   Stack({ alignContent: Alignment.Center }) {
     Text(params.text)
-      .textStyle(14)
+      .textStyle()
   }
   .width('100%')
   .height('100%')
-  .backgroundColor($r('app.color.lyrics_background'))
+  .backgroundColor($r('app.color.main'))
 }
 
 export class TextNodeController extends NodeController {
@@ -86,25 +90,48 @@ class LyricsPipManager {
     }
   }
 
+  public startPip() {
+    if(!this.isPipStarted) {
+      if(this.pipController) {
+        this.pipController.startPiP()
+        this.isPipStarted = true
+      } else {
+        this.startLyricsPip()
+      }
+    }
+  }
+
+  public stopPip() {
+    if(this.pipController && this.isPipStarted) {
+      this.pipController.stopPiP()
+      this.isPipStarted = false
+    }
+  }
+
   public updateLyrics(currentLyric: string) {
     this.nodeController.update(currentLyric);
   }
 
   onStateChange(state: PiPWindow.PiPState, reason: string) {
+    let newStyle = floatLyricStyle.get()
     switch (state) {
       case PiPWindow.PiPState.STARTED:
-        this.isPipStarted = true;
-        break;
+        this.isPipStarted = true
+        newStyle.on = true
+        changeSettings(StorageConstants.FLOAT_LYRIC_STYLE, newStyle)
+        break
       case PiPWindow.PiPState.STOPPED:
-        this.isPipStarted = false;
-        this.pipController = undefined;
-        break;
+        this.isPipStarted = false
+        this.pipController = undefined
+        newStyle.on = false
+        changeSettings(StorageConstants.FLOAT_LYRIC_STYLE, newStyle)
+        break
       case PiPWindow.PiPState.ERROR:
-        this.pipController = undefined;
-        this.isPipStarted = false;
-        break;
+        this.isPipStarted = false
+        this.pipController = undefined
+        break
       default:
-        break;
+        break
     }
   }
 
