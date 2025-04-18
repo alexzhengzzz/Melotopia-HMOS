@@ -26,6 +26,7 @@ export struct LyricComponent {
     }, 10)
     this.userScrollingInterval = setInterval(() => {
       if(this.userScrolling > 0) this.userScrolling -= 1
+      else if(this.userScrolling === 0) this.ToCurrentLyric()
     }, 1000)
 
     EmitterUtil.onSubscribe(EmitterConstants.EMITTER_LYRIC_UPDATE, async () => {
@@ -61,7 +62,10 @@ export struct LyricComponent {
           })
         }
         .offset({ y: this.Offset(index) })
-        .padding({ top: this.lyricStyle.size / 2, bottom: this.lyricStyle.size / 2 })
+        .padding({
+          top: this.userScrolling ? this.lyricStyle.size * 0.75 : this.lyricStyle.size * 0.5,
+          bottom: this.userScrolling ? this.lyricStyle.size * 0.75 : this.lyricStyle.size * 0.5
+        })
         .animation(this.userScrolling ? { } : {
           delay: this.Delay(index),
           duration: (this.currentLyricIndex > index ? 300 : 500),
@@ -79,7 +83,7 @@ export struct LyricComponent {
     .padding({ top: 30 })
     .width('100%')
     .height('100%')
-    .edgeEffect(EdgeEffect.None)
+    .edgeEffect(EdgeEffect.Spring)
     .scrollSnapAlign(ScrollSnapAlign.CENTER)
     .listDirection(Axis.Vertical)
     .cachedCount(20)
@@ -96,13 +100,14 @@ export struct LyricComponent {
   }
 
   Offset(index: number) {
+    if(this.userScrolling) return 0
     const LINE_SPACING = this.lyricStyle.size
     const delta = index - this.currentLyricIndex
-    let offset = Math.abs(delta) < 6
+    let offset = Math.abs(delta) < 10
       ? delta * LINE_SPACING
       : delta > 0
-        ? 6 * LINE_SPACING
-        : -6 * LINE_SPACING
+        ? 10 * LINE_SPACING
+        : -10 * LINE_SPACING
     return offset
   }
 
@@ -137,14 +142,13 @@ export struct LyricComponent {
       .opacity(this.index == this.currentLyricIndex ? 1 : 0.35)
       .fontWeight(this.index === this.currentLyricIndex ? FontWeight.Bolder : FontWeight.Bold)
       .textAlign(this.lyricStyle.align === 'center' ? TextAlign.Center : TextAlign.Start)
-      // .scale(this.index === this.currentLyricIndex ?
-      //   { x: 1.0, y: 1.0, centerX: this.lyricStyle.align === 'center' ? '50%' : 0 } :
-      //   { x: 0.9, y: 0.9, centerX: this.lyricStyle.align === 'center' ? '50%' : 0 })
       .clickEffect({ level: ClickEffectLevel.LIGHT, scale: 0.9 })
       .padding({ left: 20, right: 20 })
       .onClick(() => {
-        this.userScrolling = 0
         seekMusic(this.item.time + 100)
+        setTimeout(() => {
+          this.userScrolling = 0
+        }, 100)
       })
       .animation(this.userScrolling ? { } : {
         duration: 300,
