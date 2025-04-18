@@ -7,6 +7,7 @@ import { StorageConstants } from "../../common/constants/StorageConstants"
 import Constants from "../../common/constants/Constants"
 import { ClickUtil } from "@pura/harmony-utils"
 import { PLAYMODE } from "../../common/model/Enum"
+import { lyricsPipManager } from "../../pages/lyrics/PipLyrics"
 
 /**
  * 底部播控组件
@@ -19,7 +20,7 @@ export struct BottomBarComponent {
   @StorageProp(StorageConstants.PLAY_ARTISTS) artists: string = ''
   @StorageProp(StorageConstants.IS_PAUSED) isPaused: boolean = true
   @StorageProp(StorageConstants.PIC_URL) picUrl: string = ''
-  @StorageProp(StorageConstants.CURRENT_LYRIC) currentLyric: string = ''
+  @StorageProp(StorageConstants.CURRENT_LYRIC) @Watch('updateLyrics') currentLyric: string = ''
   @State isShow: boolean = false
   private handlePlayClick = async () => {
     if(!this.isPlaying) {
@@ -33,6 +34,12 @@ export struct BottomBarComponent {
   build() {
     Row() {
       Image(this.playmode === PLAYMODE.LOCAL ? this.picUrl : this.picUrl + '?param=512y512')
+        .gesture(GestureGroup(GestureMode.Exclusive,
+          TapGesture({ count: 2 })
+            .onAction(() => {
+              lyricsPipManager.handleClickPip()
+            }),
+        ))
         .height(Constants.HEIGHT_MINI)
         .aspectRatio(1)
         .borderRadius(Constants.RADIUS_IMG)
@@ -119,6 +126,10 @@ export struct BottomBarComponent {
       PlayQueueButton({ imgWidth: 25, imgColor: $r('app.color.app_red') })
     }
     .padding({ right: 5 })
+  }
+
+  updateLyrics() {
+    lyricsPipManager.updateLyrics(this.currentLyric)
   }
 }
 
