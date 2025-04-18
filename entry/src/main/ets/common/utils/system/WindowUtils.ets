@@ -1,5 +1,5 @@
 import { display, window } from '@kit.ArkUI'
-import { LogUtil } from '@pura/harmony-utils'
+import { LogUtil, PermissionUtil, ToastUtil } from '@pura/harmony-utils'
 import Constants from '../../constants/Constants'
 import { StorageConstants } from '../../constants/StorageConstants'
 import { FloatLyric } from '../../entities/local/Settings'
@@ -44,12 +44,13 @@ class WindowUtils {
     } else return window.Orientation.UNSPECIFIED
   }
 
-  createLyricsFloatWindow(): void {
+  async createLyricsFloatWindow(): Promise<void> {
     if(this.lyricWindowClass) return
     let config: window.Configuration =
       { name: Constants.FLOAT_LYRICS_WIN_NAME, windowType: window.WindowType.TYPE_FLOAT, ctx: getContext(this) };
     window.createWindow(config, (err, data) => {
       if (err.code) {
+        ToastUtil.showToast(`开启悬浮窗失败: code-${err.code}`)
         console.error('Failed to create the floatWindow. Cause: ' + JSON.stringify(err));
         return;
       }

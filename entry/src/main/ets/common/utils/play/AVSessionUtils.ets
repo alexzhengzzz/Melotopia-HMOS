@@ -143,8 +143,10 @@ class AVSessionUtils {
    * 设置为暂停状态
    */
   async pauseState(time: number) {
+    let loopMode = await getLoopMode()
     let pausedState: avSession.AVPlaybackState = {
       state: avSession.PlaybackState.PLAYBACK_STATE_PAUSE,
+      loopMode: loopMode,
       position: {
         elapsedTime: time,
         updateTime: new Date().getTime()

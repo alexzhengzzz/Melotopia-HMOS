@@ -30,35 +30,9 @@
 git clone https://github.com/Chenlvin/Melotopia-HMOS
 `````
 
-#### 侧载安装
+#### 2.侧载安装
 
 [ >> Releases](https://github.com/Chenlvin/Melotopia-HMOS/releases)
-
----
-
-## 🔧 可能出现的问题
-
-#### 调试或运行出现“9568289 - install failed due to grant request permissions failed”
-
-这是由于应用申请的一个权限： [ohos.permission.SYSTEM_FLOAT_WINDOW](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides-V5/restricted-permissions-V5)
-
-应用通过该权限, 创建悬浮窗以实现“浮动歌词”功能, 
-该权限属于ACL受限开发权限, 需要使用
-[ACL方式声明](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides-V5/ide-signing-V5#section9786111152213)使用
-
-权限对应代码位置: \entry\src\main\module.json5
-
-````bash
-{
-          "name" : "ohos.permission.SYSTEM_FLOAT_WINDOW",
-          "usedScene": {
-            "abilities": [
-              "EntryAbility"
-            ],
-            "when":"in"
-          }
-        },
-````
 
 ---
 

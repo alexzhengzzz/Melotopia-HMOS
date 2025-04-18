@@ -10,5 +10,5 @@ export class AppConstants {
   /**
    * Version Description
    */
-  static readonly VER_DESC: string = ''
+  static readonly VER_DESC: string = 'Patch_1'
 }

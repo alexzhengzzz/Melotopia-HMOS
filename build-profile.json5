@@ -31,26 +31,26 @@
         "name": "hicar",
         "type": "HarmonyOS",
         "material": {
-          "certpath": "C:\\Users\\zcy01\\.ohos\\config\\hicar_CloudMusic-HMOS_49Cx5ZkdoyjQADe6JwU6Rz-R50i5AkaXO1mOEwbzolc=.cer",
+          "certpath": "C:\\Users\\zcy01\\.ohos\\config\\hicar_Melotopia-HMOS_cM93J5NWC6MyuAKWXzxrDyf35CRmF-S1Mq-S_6bIv1w=.cer",
           "keyAlias": "debugKey",
-          "keyPassword": "0000001ABFB05085F1FEA8741BA1EAD8A5DFF8E08D0EE07D18FF06A33CFD259110A9644BDD4329953656",
-          "profile": "C:\\Users\\zcy01\\.ohos\\config\\hicar_CloudMusic-HMOS_49Cx5ZkdoyjQADe6JwU6Rz-R50i5AkaXO1mOEwbzolc=.p7b",
+          "keyPassword": "0000001AA265D00863492EDF4F32659BF256C04B9FE78DA6FC239E69F14B910E8AE6B42A808C6B0E6FE5",
+          "profile": "C:\\Users\\zcy01\\.ohos\\config\\hicar_Melotopia-HMOS_cM93J5NWC6MyuAKWXzxrDyf35CRmF-S1Mq-S_6bIv1w=.p7b",
           "signAlg": "SHA256withECDSA",
-          "storeFile": "C:\\Users\\zcy01\\.ohos\\config\\hicar_CloudMusic-HMOS_49Cx5ZkdoyjQADe6JwU6Rz-R50i5AkaXO1mOEwbzolc=.p12",
-          "storePassword": "0000001A2B092C2C6DBF73AB972FF9F399373A051882E1FF9496DFBE744BE3B523B60CA21D6BD6CF8D19"
+          "storeFile": "C:\\Users\\zcy01\\.ohos\\config\\hicar_Melotopia-HMOS_cM93J5NWC6MyuAKWXzxrDyf35CRmF-S1Mq-S_6bIv1w=.p12",
+          "storePassword": "0000001A7C4E9BBBC0A15E75811134B0BAA806042A596C68390C17302D5FB2A8C148A733FF07E44E27D0"
         }
       },
       {
         "name": "Melotopia",
         "type": "HarmonyOS",
         "material": {
-          "certpath": "C:\\Users\\zcy01\\.ohos\\config\\Melotopia_CloudMusic-HMOS_49Cx5ZkdoyjQADe6JwU6Rz-R50i5AkaXO1mOEwbzolc=.cer",
+          "certpath": "C:\\Users\\zcy01\\.ohos\\config\\Melotopia_Melotopia-HMOS_cM93J5NWC6MyuAKWXzxrDyf35CRmF-S1Mq-S_6bIv1w=.cer",
           "keyAlias": "debugKey",
-          "keyPassword": "0000001B90C6F791B521AC7DD8295924F4DEFDD7D76533CED64E36CEC25A88AA5D0F706A6D8119551B3B22",
-          "profile": "C:\\Users\\zcy01\\.ohos\\config\\Melotopia_CloudMusic-HMOS_49Cx5ZkdoyjQADe6JwU6Rz-R50i5AkaXO1mOEwbzolc=.p7b",
+          "keyPassword": "0000001B2F4D0D761D60E6E2F3541CCBEA0EB17A2700B9CCFEE59E4A225C312C24FE67F899CF1A7524477B",
+          "profile": "C:\\Users\\zcy01\\.ohos\\config\\Melotopia_Melotopia-HMOS_cM93J5NWC6MyuAKWXzxrDyf35CRmF-S1Mq-S_6bIv1w=.p7b",
           "signAlg": "SHA256withECDSA",
-          "storeFile": "C:\\Users\\zcy01\\.ohos\\config\\Melotopia_CloudMusic-HMOS_49Cx5ZkdoyjQADe6JwU6Rz-R50i5AkaXO1mOEwbzolc=.p12",
-          "storePassword": "0000001B914488CF9847AD91224014DF17F05195C9AA72E15096CD5C9E27C70795C8DCB4DBB5E9D3894A63"
+          "storeFile": "C:\\Users\\zcy01\\.ohos\\config\\Melotopia_Melotopia-HMOS_cM93J5NWC6MyuAKWXzxrDyf35CRmF-S1Mq-S_6bIv1w=.p12",
+          "storePassword": "0000001B29F2F11FCDDDECF673978BA872D903309AD738ED3B5ADB314BE95F68CA1DCE44CF4F26C3D76DAC"
         }
       }
     ],

@@ -230,9 +230,10 @@ export async function completeDo() {
  */
 export async function changeCycleMode(mode: number) {
   AppStorage.setOrCreate(StorageConstants.CYCLE_MODE, mode)
-  PreferencesUtils.putPreferenceValue(pref,StorageConstants.CYCLE_MODE, mode).then(async () => {
-    AVSessionUtils.playState(await getPlayTime())
-  })
+  const isPaused = AppStorage.get(StorageConstants.IS_PAUSED) as boolean
+  await PreferencesUtils.putPreferenceValue(pref,StorageConstants.CYCLE_MODE, mode)
+  if(isPaused) AVSessionUtils.pauseState(await getPlayTime())
+  else AVSessionUtils.playState(await getPlayTime())
 }
 
 /**
