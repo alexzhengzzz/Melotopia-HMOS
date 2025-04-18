@@ -16,12 +16,18 @@ class Params {
 @Extend(Text)
 function textStyle(size: number) {
   .fontSize(size)
-  .fontColor(Color.Red)
-  .fontWeight(FontWeight.Bolder)
-  .textAlign(TextAlign.Start)
+  .fontWeight(FontWeight.Bold)
   .layoutWeight(1)
   .width('100%')
   .maxLines(1)
+  .fontColor($r('app.color.lyrics_font'))
+  .textShadow({  // 文字阴影增强
+    radius: 2,
+    color: Color.Black,
+    offsetX: 1,
+    offsetY: 1
+  })
+  .textAlign(TextAlign.Center)
   .padding({ left: 10, right: 10 })
   .textOverflow({ overflow: TextOverflow.Ellipsis })
 }
@@ -31,12 +37,10 @@ function buildText(params: Params) {
   Stack({ alignContent: Alignment.Center }) {
     Text(params.text)
       .textStyle(14)
-      .textAlign(TextAlign.Start)
   }
-  .backgroundColor(Color.Gray)
-  .opacity(0.5)
   .width('100%')
   .height('100%')
+  .backgroundColor($r('app.color.lyrics_background'))
 }
 
 export class TextNodeController extends NodeController {
