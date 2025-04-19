@@ -182,7 +182,7 @@ class LyricsPipManager {
     let promise: Promise<PiPWindow.PiPController> = PiPWindow.create(config)
     promise.then((data: PiPWindow.PiPController) => {
       this.pipController = data
-      this.pipController.setAutoStartEnabled(true);
+      this.pipController.setAutoStartEnabled(false);
       this.pipController.startPiP();
       this.pipController.on('controlEvent', (control: PiPWindow.ControlEventParam) => {
         this.onActionEvent(control);
