@@ -67,8 +67,8 @@ export struct LyricComponent {
           bottom: this.userScrolling ? this.lyricStyle.size * 0.75 : this.lyricStyle.size * 0.5
         })
         .animation(this.userScrolling ? { } : {
-          delay: this.Delay(index),
-          duration: (this.currentLyricIndex > index ? 300 : 500),
+          delay: this.userScrolling ? 0 : this.Delay(index),
+          duration: 500,
           curve: Curve.Smooth,
           expectedFrameRateRange: {
             expected: 120,

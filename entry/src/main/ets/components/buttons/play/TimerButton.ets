@@ -9,11 +9,12 @@ import { TimerSheet } from "../../sheets/TimerSheet"
 export struct TimerButton {
   @Prop isTimerWorking: boolean = false
   @Link isShow: boolean
+  @State wid: number = 30
 
   build() {
     Image($r('app.media.ic_timer_icon'))
       .fillColor(Color.White)
-      .height(30)
+      .width(this.wid)
       .aspectRatio(1)
       .draggable(false)
       .backgroundColor(Color.Transparent)
