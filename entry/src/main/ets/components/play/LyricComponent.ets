@@ -50,7 +50,7 @@ export struct LyricComponent {
     setTimeout(() => {
       this.dataSource.setData(this.lyric)
       this.dataSource.notifyDataReload()
-    }, 200)
+    }, 10)
   }
 
   ToCurrentLyric() {
