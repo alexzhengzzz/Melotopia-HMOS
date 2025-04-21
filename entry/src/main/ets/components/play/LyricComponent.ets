@@ -7,6 +7,7 @@ import { StorageConstants } from "../../common/constants/StorageConstants"
 import { LyricStyle, LyricStyleItem } from "../../common/entities/local/Settings"
 import LyricUtils from "../../common/utils/play/LyricUtils"
 import { LazyData } from "@pie/lazy-data"
+import Constants from "../../common/constants/Constants"
 
 @Component
 export struct LyricComponent {
@@ -18,6 +19,7 @@ export struct LyricComponent {
   @State lyric: Lyric[] = []
   @State dataSource: LazyData<Lyric> = new LazyData()
   @State currentListIndex: number = 0
+  @State isLoading: boolean = false
   @StorageProp(StorageConstants.LYRIC_STYLE) lyricStyle: LyricStyle = LyricStyleItem
 
   private scroller: Scroller = new Scroller()
@@ -35,8 +37,13 @@ export struct LyricComponent {
     }, 1000)
 
     EmitterUtil.onSubscribe(EmitterConstants.EMITTER_LYRIC_UPDATE, async () => {
+      this.isLoading = true
       this.currentLyricIndex = 0
-      await this.getLyric()
+      this.dataSource.setData([{ time: 0, content: '⋯'}])
+      setTimeout(async () => {
+        await this.getLyric()
+        this.isLoading = false
+      }, 500)
     })
   }
 
@@ -45,12 +52,9 @@ export struct LyricComponent {
   }
 
   async getLyric() {
-    this.dataSource.setData([{ time: 0, content: '⋯'}])
     this.lyric = await LyricUtils.getLyricObjects()
-    setTimeout(() => {
-      this.dataSource.setData(this.lyric)
-      this.dataSource.notifyDataReload()
-    }, 10)
+    this.dataSource.setData(this.lyric)
+    this.dataSource.notifyDataReload()
   }
 
   ToCurrentLyric() {
@@ -66,32 +70,41 @@ export struct LyricComponent {
 
   build() {
     List({ scroller: this.scroller }) {
-      LazyForEach(this.dataSource, (item: Lyric, index) => {
+      if(this.isLoading) {
         ListItem() {
-          LyricLine({
-            lyricStyle: this.lyricStyle,
-            currentLyricIndex: this.currentLyricIndex,
-            userScrolling: this.userScrolling,
-            index: index,
-            item: item
-          })
+          LoadingProgress().width(Constants.SIZE_LOADING_PROGRESS_DEFAULT)
         }
-        .offset({ y: this.Offset(index) })
-        .padding({
-          top: this.userScrolling ? this.lyricStyle.size : this.lyricStyle.size * 0.5,
-          bottom: this.userScrolling ? this.lyricStyle.size : this.lyricStyle.size * 0.5
-        })
-        .animation(this.userScrolling ? { } : {
-          delay: this.userScrolling ? 0 : this.Delay(index),
-          duration: 500,
-          curve: Curve.Smooth,
-          expectedFrameRateRange: {
-            expected: 90,
-            min: 60,
-            max: 90
+        .align(Alignment.Center)
+        .width('100%')
+        .layoutWeight(1)
+      } else {
+        LazyForEach(this.dataSource, (item: Lyric, index) => {
+          ListItem() {
+            LyricLine({
+              lyricStyle: this.lyricStyle,
+              currentLyricIndex: this.currentLyricIndex,
+              userScrolling: this.userScrolling,
+              index: index,
+              item: item
+            })
           }
+          .offset({ y: this.Offset(index) })
+          .padding({
+            top: this.userScrolling ? this.lyricStyle.size : this.lyricStyle.size * 0.5,
+            bottom: this.userScrolling ? this.lyricStyle.size : this.lyricStyle.size * 0.5
+          })
+          .animation(this.userScrolling ? { } : {
+            delay: this.userScrolling ? 0 : this.Delay(index),
+            duration: 500,
+            curve: Curve.Smooth,
+            expectedFrameRateRange: {
+              expected: 90,
+              min: 60,
+              max: 90
+            }
+          })
         })
-      })
+      }
     }
     .cachedCount(15)
     .alignListItem(ListItemAlign.End)
