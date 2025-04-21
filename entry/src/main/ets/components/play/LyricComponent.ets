@@ -6,6 +6,7 @@ import { EmitterConstants } from "../../common/constants/EmitterConstants"
 import { StorageConstants } from "../../common/constants/StorageConstants"
 import { LyricStyle, LyricStyleItem } from "../../common/entities/local/Settings"
 import LyricUtils from "../../common/utils/play/LyricUtils"
+import { LazyData } from "@pie/lazy-data"
 
 @Component
 export struct LyricComponent {
@@ -15,6 +16,7 @@ export struct LyricComponent {
   @State userScrolling: number = 0
   @State userScrollingInterval: number = 0
   @State lyric: Lyric[] = []
+  @State dataSource: LazyData<Lyric> = new LazyData()
   @State currentListIndex: number = 0
   @StorageProp(StorageConstants.LYRIC_STYLE) lyricStyle: LyricStyle = LyricStyleItem
 
@@ -43,7 +45,12 @@ export struct LyricComponent {
   }
 
   async getLyric() {
+    this.dataSource.setData([{ time: 0, content: '⋯'}])
     this.lyric = await LyricUtils.getLyricObjects()
+    setTimeout(() => {
+      this.dataSource.setData(this.lyric)
+      this.dataSource.notifyDataReload()
+    }, 200)
   }
 
   ToCurrentLyric() {
@@ -59,7 +66,7 @@ export struct LyricComponent {
 
   build() {
     List({ scroller: this.scroller }) {
-      ForEach(this.lyric, (item: Lyric, index) => {
+      LazyForEach(this.dataSource, (item: Lyric, index) => {
         ListItem() {
           LyricLine({
             lyricStyle: this.lyricStyle,
@@ -86,7 +93,7 @@ export struct LyricComponent {
         })
       })
     }
-    .cachedCount(50)
+    .cachedCount(15)
     .alignListItem(ListItemAlign.End)
     .padding({ top: 30 })
     .width('100%')
@@ -131,7 +138,8 @@ export struct LyricComponent {
 }
 
 @Reusable
-@Component struct LyricLine {
+@Component
+struct LyricLine {
   @State index: number = 0
   @State item: Lyric = { time: 0, content: ''}
   @Prop currentLyricIndex: number = 0
@@ -149,9 +157,9 @@ export struct LyricComponent {
       .textAlign(TextAlign.Center)
       .fontSize(this.lyricStyle.size)
       .lineHeight(this.lyricStyle.size * 1.3)
-      .fontColor(this.index === this.currentLyricIndex ? this.lyricStyle.color : Color.White)
+      .fontColor(Color.White)
       .opacity(this.index == this.currentLyricIndex ? 1 : 0.35)
-      .fontWeight(this.index === this.currentLyricIndex ? FontWeight.Bolder : FontWeight.Bold)
+      .fontWeight(FontWeight.Bolder)
       .textAlign(this.lyricStyle.align === 'center' ? TextAlign.Center : TextAlign.Start)
       .clickEffect({ level: ClickEffectLevel.LIGHT, scale: 0.9 })
       .padding({ left: 20, right: 20 })
@@ -162,13 +170,8 @@ export struct LyricComponent {
         }, 100)
       })
       .animation(this.userScrolling ? { } : {
-        duration: 100,
-        curve: Curve.Smooth,
-        expectedFrameRateRange: {
-          expected: 90,
-          min: 60,
-          max: 90
-        }
+        duration: 300,
+        curve: Curve.Smooth
       })
   }
 }
