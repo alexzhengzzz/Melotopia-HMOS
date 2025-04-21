@@ -1,5 +1,5 @@
 import { EmitterUtil, FileUtil, LogUtil, RandomUtil, ToastUtil } from "@pura/harmony-utils";
-import { Song, SongItem } from "../../entities/song/Song";
+import { Song } from "../../entities/song/Song";
 import FileUtils from "../../utils/file/FileUtils";
 import { checkMusic, getPersonalFmSong, getSongPicUrl, getSongUrl } from "../../../api/songApi";
 import { fetchMetadata, getArtists, sanitizeFileName } from "../common/convert";
@@ -15,7 +15,6 @@ import { StorageConstants } from "../../constants/StorageConstants";
 import { JSON } from "@kit.ArkTS";
 import AVPlayerUtils from "../../utils/play/AVPlayerUtils";
 import { isThisSongLiked } from "./songLike";
-import { PlayListSong } from "../../entities/playlist/PlayListSongs";
 import AudioCacheUtils from "../../utils/play/AudioCacheUtils";
 
 
@@ -30,7 +29,8 @@ export async function playMusicByUrl(song: Song, isLogged: boolean, picUrl: stri
     const isAccessible = await checkMusic(song.id)
     if(!isAccessible) {
       ToastUtil.showToast('当前歌曲无版权或不可用, 自动播放下一首')
-      playNext()
+      setTimeout(playNext, 1000)
+      return
     }
     isThisSongLiked(song.id)
     let artists = getArtists(song.artists)
@@ -74,7 +74,7 @@ export async function playMusicWithFile(song: Song, fileName: string) {
     let file = await fileIo.open(fileUrl)
     let fdPath = 'fd://' + file.fd
     const metadata = await fetchMetadata(fileUrl)
-    const artistsString = await getArtists(song.artists)
+    const artistsString = getArtists(song.artists)
     if(metadata) {
       song.duration = (metadata.duration) ? parseInt(metadata.duration) : 0
     }
@@ -157,7 +157,7 @@ export async function playPre() {
 /**
  * 播放下一首
  */
-export async function playNext() {
+export const playNext = async () => {
   const isPersonalFm = await AppStorage.get(StorageConstants.IS_PERSONAL_FM) as boolean
   if(isPersonalFm && !(PlayQueueUtils.currentQueueIndex < PlayQueueUtils.queue.length - 1)) {
     const personalFmMode = AppStorage.get(StorageConstants.PERSONAL_FM_MODE) as number

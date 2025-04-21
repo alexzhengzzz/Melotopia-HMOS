@@ -361,14 +361,16 @@ export struct Player {
           .aspectRatio(1)
           .height(this.song.id === 0 ? '70%' : '100%')
           .borderRadius(5)
+          .scale({ x: this.isPaused ? 0.9 : 1.0, y: this.isPaused ? 0.9 : 1.0})
+          .animation({ duration: 300, curve: Curve.Smooth })
           .gesture(
             TapGesture({
               count: 2,
             }).onAction(this.handleLike)
           )
       }
-      .justifyContent(FlexAlign.Center)
       .width('100%')
+      .justifyContent(FlexAlign.Center)
       .aspectRatio(1)
 
       Row({ space: 10 }) {
@@ -390,6 +392,10 @@ export struct Player {
             })
             .bindSheet(this.isShowArtists, this.ArtistsSheet(), this.artistsSheetOptions)
         }
+        .constraintSize({
+          minWidth: 0,
+          maxWidth: 500
+        })
         .layoutWeight(1)
 
         this.ToolBar()
@@ -399,6 +405,10 @@ export struct Player {
     .layoutWeight(1)
     .padding({ left: Constants.PADDING_MEDIUM, right: Constants.PADDING_MEDIUM, top: px2vp(this.topRectHeight) + Constants.PADDING_EDGE_TEXT })
     .justifyContent(FlexAlign.Center)
+    .constraintSize({
+      minWidth: 0,
+      maxWidth: 500
+    })
     .gesture(
       SwipeGesture({
         fingers: 1,
@@ -509,7 +519,7 @@ export struct Player {
         .height(30)
       }
       .constraintSize({
-        minWidth: 200,
+        minWidth: 0,
         maxWidth: 500
       })
       .width('100%')
@@ -524,18 +534,20 @@ export struct Player {
         Column() {
           this.SongInfo()
         }
+        .width(this.deviceType === resourceManager.DeviceType.DEVICE_TYPE_TABLET ? '80%' : '90%')
+        .height('100%')
         .layoutWeight(1)
 
-        Column({ space: 10 }) {
+        Column() {
           this.SliderContent()
           this.ControllButtons()
           Row({ space: 15 }) {
             if(this.isLocalFile || this.playmode == 0) { Text('本地文件播放中').fontSize(10).fontColor(Color.Gray) }
             if(this.isTimerWorking) { Text('已设置定时关闭').fontSize(10).fontColor(Color.Gray) }
           }
-          .height(30)
+          .visibility(this.isLocalFile || this.playmode == 0 || this.isTimerWorking ? Visibility.Visible : Visibility.Hidden)
         }
-        .width(this.deviceType === resourceManager.DeviceType.DEVICE_TYPE_TABLET ? '70%' : '90%')
+        .width(this.deviceType === resourceManager.DeviceType.DEVICE_TYPE_TABLET ? '80%' : '90%')
       }
       .layoutWeight(1)
 

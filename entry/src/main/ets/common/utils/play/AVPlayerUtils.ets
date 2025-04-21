@@ -20,6 +20,7 @@ class AVPlayerUtils {
   private isSeeking: boolean = false
   private errorFlag: boolean = false
   private pauseFlag: boolean = false
+  private lastErrorTime: number = 0
 
   getCurrentTime() {
     return this.avPlayer!.currentTime
@@ -69,6 +70,7 @@ class AVPlayerUtils {
       LyricUtils.startInterval()
       ContinuousTask.startTask()
       avPlayer.play()
+      this.pauseFlag = false
       // this.updateAvSession = setInterval(() => {
       //   if (avPlayer.state === 'playing') {
       //     AVSessionUtils.playState(avPlayer.currentTime)
@@ -124,11 +126,20 @@ class AVPlayerUtils {
     avPlayer.on('error', (err: BusinessError) => {
       LogUtil.error(TAG, `Invoke avPlayer failed, code is ${err.code}, message is ${err.message}`)
       if(avPlayer.state === 'paused' || avPlayer.state === 'stopped') return
-      setTimeout(() => {
-        if(this.errorFlag) return
-        playQueue(PlayQueueUtils.currentQueueIndex)
-        this.errorFlag = false
-      }, 1000)
+
+      const currentTime = Date.now()
+      if (currentTime - this.lastErrorTime < 3000) {
+        return
+      }
+
+      this.lastErrorTime = currentTime
+      if (!this.errorFlag) {
+        this.errorFlag = true
+        setTimeout(() => {
+          playQueue(PlayQueueUtils.currentQueueIndex)
+          this.errorFlag = false
+        }, 3000)
+      }
     })
     avPlayer.on('audioOutputDeviceChangeWithInfo', async(changeInfo: audio.AudioStreamDeviceChangeInfo) => {
       if (changeInfo.changeReason == audio.AudioStreamDeviceChangeReason.REASON_OLD_DEVICE_UNAVAILABLE) {

@@ -15,7 +15,7 @@ class ContinuousTask {
     let wantAgentInfo: wantAgent.WantAgentInfo = {
       wants: [
         {
-          bundleName: "cn.chenlvin.melotopia.hm",
+          bundleName: "cc.chenlvin.cloudmusic",
           abilityName: "EntryAbility"
         }
       ],
