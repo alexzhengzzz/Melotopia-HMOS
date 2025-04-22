@@ -29,26 +29,30 @@ export struct LyricComponent {
     setTimeout(() => {
       this.scroller.scrollToIndex(this.currentLyricIndex, false, ScrollAlign.CENTER)
     }, 10)
-    this.userScrollingInterval = setInterval(() => {
-      if(this.userScrolling > 0) this.userScrolling -= 1
-      else if(this.userScrolling === 0) {
-        this.ToCurrentLyric()
-      }
-    }, 1000)
+    this.StartAutoScrollTimer()
 
     EmitterUtil.onSubscribe(EmitterConstants.EMITTER_LYRIC_UPDATE, async () => {
       this.isLoading = true
       this.currentLyricIndex = 0
-      this.dataSource.setData([{ time: 0, content: '⋯'}])
       setTimeout(async () => {
         await this.getLyric()
         this.isLoading = false
-      }, 500)
+      }, 100)
     })
   }
 
   aboutToDisappear(): void {
     clearInterval(this.userScrollingInterval)
+  }
+
+  private StartAutoScrollTimer() {
+    this.userScrollingInterval = setInterval(() => {
+      if(this.userScrolling > 0) {
+        this.userScrolling -= 1
+      } else if(this.userScrolling === 0 && this.currentListIndex !== this.currentLyricIndex) {
+        this.ToCurrentLyric()
+      }
+    }, 1000)
   }
 
   async getLyric() {
@@ -59,11 +63,7 @@ export struct LyricComponent {
 
   ToCurrentLyric() {
     if(!this.userScrolling) {
-      if(this.currentListIndex - this.currentLyricIndex > 6) {
-        this.scroller.scrollToIndex(this.currentLyricIndex, false, ScrollAlign.CENTER)
-      } else {
-        this.scroller.scrollToIndex(this.currentLyricIndex, true, ScrollAlign.CENTER)
-      }
+      this.scroller.scrollToIndex(this.currentLyricIndex, true, ScrollAlign.CENTER)
       this.currentListIndex = this.currentLyricIndex
     }
   }
@@ -79,23 +79,22 @@ export struct LyricComponent {
         .layoutWeight(1)
       } else {
         LazyForEach(this.dataSource, (item: Lyric, index) => {
-          ListItem() {
-            LyricLine({
-              lyricStyle: this.lyricStyle,
-              currentLyricIndex: this.currentLyricIndex,
-              userScrolling: this.userScrolling,
-              index: index,
-              item: item
-            })
-          }
+          LyricLine({
+            lyricStyle: this.lyricStyle,
+            currentLyricIndex: this.currentLyricIndex,
+            userScrolling: this.userScrolling,
+            index: index,
+            item: item
+          })
           .offset({ y: this.Offset(index) })
           .padding({
-            top: this.userScrolling ? this.lyricStyle.size : this.lyricStyle.size * 0.5,
-            bottom: this.userScrolling ? this.lyricStyle.size : this.lyricStyle.size * 0.5
+            bottom: this.userScrolling
+              ? this.lyricStyle.size * 2
+              : (index - this.currentLyricIndex >= 0 ? this.lyricStyle.size : this.lyricStyle.size * 2)
           })
-          .animation(this.userScrolling ? { } : {
+          .animation({
             delay: this.userScrolling ? 0 : this.Delay(index),
-            duration: 500,
+            duration: this.userScrolling ? 0 : 500,
             curve: Curve.Smooth,
             expectedFrameRateRange: {
               expected: 90,
@@ -106,7 +105,7 @@ export struct LyricComponent {
         })
       }
     }
-    .cachedCount(15)
+    .cachedCount(5)
     .alignListItem(ListItemAlign.End)
     .padding({ top: 30 })
     .width('100%')
@@ -125,8 +124,10 @@ export struct LyricComponent {
     .onScrollIndex((start, end, center) => {
       this.currentListIndex = center
     })
-    .onTouch(() => {
-      this.userScrolling = 2
+    .onTouch((event: TouchEvent) => {
+      if (event.type === TouchType.Move) {
+        this.userScrolling = 2
+      }
     })
   }
 
@@ -134,18 +135,15 @@ export struct LyricComponent {
     if(this.userScrolling) return 0
     const LINE_SPACING = this.lyricStyle.size
     const delta = index - this.currentLyricIndex
-    let offset = Math.abs(delta) < 6
-      ? delta * LINE_SPACING
-      : delta > 0
-        ? 6 * LINE_SPACING
-        : -6 * LINE_SPACING
+    let offset = delta > 0 ? delta * LINE_SPACING : 0
     return offset
   }
 
   Delay(index: number) {
+    if(this.userScrolling) return 0
     const delta = index - this.currentLyricIndex
-    if(delta > 5) return 6 * 120
-    return Math.max(delta * 120, 0)
+    if(delta > 10) return 10 * 80
+    return Math.max(delta * 80, 0)
   }
 
 }
@@ -182,8 +180,8 @@ struct LyricLine {
           this.userScrolling = 0
         }, 100)
       })
-      .animation(this.userScrolling ? { } : {
-        duration: 300,
+      .animation({
+        duration: this.userScrolling ? 0 :300,
         curve: Curve.Smooth
       })
   }

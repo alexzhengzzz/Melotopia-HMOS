@@ -46,7 +46,6 @@ export struct Player {
   @State sliderThickness: number = 10
   @State isMovingSlider: boolean = false
   @State sliderMovingTime: number = 0
-  @State tabPageIndex: number = 0
   @State isShowMenu: boolean = false
   @State isShowTimer: boolean = false
   @State isShowAddSheet: boolean = false
@@ -282,7 +281,7 @@ export struct Player {
       .width('100%')
     }
     .width('100%')
-    .opacity(this.tabPageIndex == 0 ? 0.6 : 0.1)
+    .opacity(0.6)
   }
 
   @Builder
@@ -537,7 +536,7 @@ export struct Player {
       this.PlayButton(50)
       PlayQueueButton({ imgWidth: 25, imgColor: Color.White }).opacity(0.8)
     }
-    .opacity(this.tabPageIndex == 0 ? 0.6 : 0.1)
+    .opacity(0.6)
     .padding({ top: Constants.PADDING_EDGE_DEFAULT, bottom: Constants.PADDING_EDGE_DEFAULT })
     .justifyContent(FlexAlign.SpaceBetween)
     .width('90%')
@@ -559,7 +558,7 @@ export struct Player {
             this.PlayButton(35)
           }
           .padding({ left: 5, right: Constants.PADDING_EDGE_DEFAULT })
-          .opacity(0.5)
+          .opacity(0.3)
           .constraintSize({
             minWidth: 0,
             maxWidth: 500
@@ -576,11 +575,6 @@ export struct Player {
       .clip(false)
       .loop(false)
       .layoutWeight(1)
-      .onAnimationStart((from, target) => {
-        animateTo({ duration: 300, curve: Curve.EaseInOut }, () => {
-          this.tabPageIndex = target
-        })
-      })
     }
     .height('100%')
     .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP])
@@ -604,7 +598,6 @@ export struct Player {
     .width(this.widBp === 'md' ? '100%' : '90%')
     .height('100%')
     .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP])
-    .onAppear(() => { this.tabPageIndex = 0 })
   }
 
   @Builder PhoneLandscapeUI() {
@@ -636,7 +629,6 @@ export struct Player {
       }
       .padding({ left: Constants.PADDING_EDGE_TEXT, right: Constants.PADDING_EDGE_TEXT })
       .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP, SafeAreaEdge.BOTTOM])
-      .onAppear(() => { this.tabPageIndex = 0 })
     }
   }
 
