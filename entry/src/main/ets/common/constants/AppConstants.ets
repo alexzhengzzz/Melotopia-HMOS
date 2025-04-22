@@ -6,9 +6,9 @@ export class AppConstants {
   /**
    * App Version Code
    */
-  static readonly VERSIONCODE: number = 10512
+  static readonly VERSIONCODE: number = 10513
   /**
    * Version Description
    */
-  static readonly VER_DESC: string = 'Patch 2'
+  static readonly VER_DESC: string = 'Patch 3'
 }

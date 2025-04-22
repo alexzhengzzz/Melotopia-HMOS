@@ -26,6 +26,7 @@ import { PlaySettingSinglePage } from "../../pages/settings/PlaySettingsPage"
 @Component
 export struct Player {
   @StorageProp(StorageConstants.TOP_RECT_HEIGHT) topRectHeight: number = 0
+  @StorageProp(StorageConstants.BOTTOM_RECT_HEIGHT) bottomRectHeight: number = 0
   @StorageProp(StorageConstants.PLAY_MODE) playmode: PLAYMODE = PLAYMODE.SINGLE
   @StorageProp(StorageConstants.PLAY_SONG) song: Song = SongItem
   @StorageProp(StorageConstants.PLAY_ARTISTS) artists: string = ''
@@ -149,7 +150,7 @@ export struct Player {
      if(this.widBp !== 'sm' && this.heightBp === 'md') {
        this.LargeUI()
      } else if(this.heightBp === 'sm' && this.widBp !== 'sm') {
-       this.PhoneLargeUI()
+       this.PhoneLandscapeUI()
      } else {
        this.PhoneUI()
      }
@@ -231,7 +232,7 @@ export struct Player {
    * 进度条组件
    */
   @Builder
-  SliderContent(isPhoneLarge: boolean = false) {
+  SliderContent() {
     Column() {
       // 进度条
       Slider({
@@ -241,7 +242,7 @@ export struct Player {
         step: 1,
         style: SliderStyle.InSet
       })
-        .width('90%')
+        .width('100%')
         .trackColor(Color.Gray)
         .trackThickness(this.sliderThickness)
         .selectedColor(Color.White)
@@ -277,11 +278,43 @@ export struct Player {
           .alignSelf(ItemAlign.End)
           .layoutWeight(1)
       }
-      .padding({ bottom: isPhoneLarge ? Constants.PADDING_EDGE_DEFAULT : Constants.PADDING_MEDIUM, left: 5, right: 5 })
-      .width('90%')
+      .padding({ bottom: Constants.PADDING_MEDIUM, left: 5, right: 5 })
+      .width('100%')
     }
-    .width(isPhoneLarge ? '90%' : '100%')
+    .width('100%')
     .opacity(this.tabPageIndex == 0 ? 0.6 : 0.1)
+  }
+
+  @Builder
+  PhoneLandscapeSlider(wid: string | number = '80%') {
+    Row() {
+      Slider({
+        value: this.time,
+        min: 0,
+        max: this.song.duration,
+        step: 1,
+        style: SliderStyle.InSet
+      })
+        .layoutWeight(1)
+        .trackColor(Color.Gray)
+        .trackThickness(this.sliderThickness)
+        .selectedColor(Color.White)
+        .showSteps(false)
+        .showTips(false)
+        .onChange(this.handleSliderChange)
+
+      Text() {
+        Span(this.isMovingSlider ? `${changeDuration(this.sliderMovingTime)}` : `${changeDuration(this.time)}`)
+        Span(' / ')
+        Span(`${changeDuration(this.song.duration)}`)
+      }
+        .fontSize(12)
+        .textAlign(TextAlign.Start)
+        .fontColor(Color.White)
+    }
+    .padding({ left: Constants.PADDING_EDGE_DEFAULT, right: Constants.PADDING_EDGE_DEFAULT })
+    .width(wid)
+    .opacity(0.5)
   }
 
   /**
@@ -352,63 +385,85 @@ export struct Player {
    */
   @Builder
   SongInfo() {
-    Column({ space: Constants.PADDING_EDGE_TEXT }) {
+    Column({ space: Constants.PADDING_MEDIUM }) {
       this.PersonalFmButton()
 
-      // 歌曲封面图片
-      Column() {
-        Image(this.playmode === 0 ? this.picUrl : this.picUrl + '?param=512y512')
-          .aspectRatio(1)
-          .height(this.song.id === 0 ? '70%' : '100%')
-          .borderRadius(5)
-          .scale({ x: this.isPaused ? 0.9 : 1.0, y: this.isPaused ? 0.9 : 1.0})
-          .animation({ duration: 300, curve: Curve.Smooth })
-          .gesture(
-            TapGesture({
-              count: 2,
-            }).onAction(this.handleLike)
-          )
-      }
-      .width('100%')
-      .justifyContent(FlexAlign.Center)
-      .aspectRatio(1)
-
-      Row({ space: 10 }) {
-        Column({ space: 10 }) {
-          // 歌曲名称&艺术家
-          Text(this.song.name)
-            .textStyle(24)
-            .fontWeight(FontWeight.Bold)
-            .onClick(() => {
-              PasteboardUtil.setDataText(this.song.name)
-              ToastUtil.showToast('已复制歌名到剪贴板', { duration: 3000 })
-            })
-          Text(this.artists)
-            .textStyle(16)
-            .onClick(() => {
-              if(this.song.id !== 0 && this.playmode !== 3) {
-                this.isShowArtists = true
-              }
-            })
-            .bindSheet(this.isShowArtists, this.ArtistsSheet(), this.artistsSheetOptions)
+      Column({ space: Constants.PADDING_MEDIUM }) {
+        // 歌曲封面图片
+        Column() {
+          Image(this.playmode === 0 ? this.picUrl : this.picUrl + '?param=512y512')
+            .aspectRatio(1)
+            .height(this.song.id === 0 ? '70%' : '100%')
+            .borderRadius(5)
+            .scale({ x: this.isPaused ? 0.9 : 1.0, y: this.isPaused ? 0.9 : 1.0})
+            .animation({ duration: 300, curve: Curve.Smooth })
+            .gesture(
+              TapGesture({
+                count: 2,
+              }).onAction(this.handleLike)
+            )
         }
+        .layoutWeight(1)
+        .height('100%')
+        .justifyContent(FlexAlign.Center)
+        .aspectRatio(1)
+        .constraintSize({
+          minWidth: 0,
+          maxWidth: '100%',
+          minHeight: 0,
+          maxHeight: 500
+        })
+
+        Row({ space: 10 }) {
+          Column({ space: 10 }) {
+            // 歌曲名称&艺术家
+            Text(this.song.name)
+              .textStyle(24)
+              .fontWeight(FontWeight.Bold)
+              .onClick(() => {
+                PasteboardUtil.setDataText(this.song.name)
+                ToastUtil.showToast('已复制歌名到剪贴板', { duration: 3000 })
+              })
+            Text(this.artists)
+              .textStyle(16)
+              .onClick(() => {
+                if(this.song.id !== 0 && this.playmode !== 3) {
+                  this.isShowArtists = true
+                }
+              })
+              .bindSheet(this.isShowArtists, this.ArtistsSheet(), this.artistsSheetOptions)
+          }
+          .layoutWeight(1)
+
+          this.ToolBar()
+        }
+        .width('100%')
         .constraintSize({
           minWidth: 0,
           maxWidth: 500
         })
-        .layoutWeight(1)
+      }
+      .justifyContent(FlexAlign.Center)
+      .layoutWeight(1)
 
-        this.ToolBar()
+      Column() {
+        this.SliderContent()
+        this.ControllButtons()
+        Row({ space: 15 }) {
+          if(this.isLocalFile || this.playmode == 0) { Text('本地文件播放中').fontSize(10).fontColor(Color.Gray) }
+          if(this.isTimerWorking) { Text('已设置定时关闭').fontSize(10).fontColor(Color.Gray) }
+        }
+        .height(30)
       }
       .width('100%')
+      .constraintSize({
+        minWidth: 0,
+        maxWidth: 500
+      })
     }
-    .layoutWeight(1)
-    .padding({ left: Constants.PADDING_MEDIUM, right: Constants.PADDING_MEDIUM, top: px2vp(this.topRectHeight) + Constants.PADDING_EDGE_TEXT })
+    .width('100%')
+    .padding({ left: Constants.PADDING_MEDIUM, right: Constants.PADDING_MEDIUM, top: px2vp(this.topRectHeight) + 50 })
     .justifyContent(FlexAlign.Center)
-    .constraintSize({
-      minWidth: 0,
-      maxWidth: 500
-    })
     .gesture(
       SwipeGesture({
         fingers: 1,
@@ -417,7 +472,7 @@ export struct Player {
     )
   }
 
-  @Builder PhoneLargeSongInfo() {
+  @Builder PhoneLandscapeInfo() {
     Column({ space: 5 }) {
       Column({ space: 5 }) {
         // 歌曲封面图片
@@ -426,6 +481,8 @@ export struct Player {
             .height(this.song.id == 0 ? '70%' : '100%')
             .borderRadius(5)
             .aspectRatio(1)
+            .scale({ x: this.isPaused ? 0.9 : 1.0, y: this.isPaused ? 0.9 : 1.0})
+            .animation({ duration: 300, curve: Curve.Smooth })
             .gesture(
               TapGesture({
                 count: 2,
@@ -439,7 +496,7 @@ export struct Player {
 
       // 歌曲名称&艺术家
       Row({ space: 5 }) {
-        Text(this.song.name)
+        Text(`${this.song.name} - ${this.artists}`)
           .textStyle(18)
           .layoutWeight(1)
           .textAlign(TextAlign.Start)
@@ -462,7 +519,7 @@ export struct Player {
       .padding({ left: Constants.PADDING_EDGE_DEFAULT, right: Constants.PADDING_EDGE_DEFAULT })
     }
     .layoutWeight(1)
-    .padding(Constants.PADDING_EDGE_DEFAULT)
+    .padding({ top: Constants.PADDING_EDGE_TEXT })
     .width('100%')
     .height('100%')
     .justifyContent(FlexAlign.Center)
@@ -483,16 +540,32 @@ export struct Player {
     .opacity(this.tabPageIndex == 0 ? 0.6 : 0.1)
     .padding({ top: Constants.PADDING_EDGE_DEFAULT, bottom: Constants.PADDING_EDGE_DEFAULT })
     .justifyContent(FlexAlign.SpaceBetween)
-    .width('80%')
+    .width('90%')
   }
 
   @Builder PhoneUI() {
     Column() {
       Swiper() {
         this.SongInfo()
-        LyricComponent()
-          .padding({ top: px2vp(this.topRectHeight) })
-          .width('100%')
+        Column() {
+          LyricComponent()
+            .width('100%')
+            .layoutWeight(1)
+          Row({ space: 10 }) {
+            Column() {
+              this.PhoneLandscapeSlider('100%')
+            }
+            .layoutWeight(1)
+            this.PlayButton(35)
+          }
+          .padding({ left: 5, right: Constants.PADDING_EDGE_DEFAULT })
+          .opacity(0.5)
+          .constraintSize({
+            minWidth: 0,
+            maxWidth: 500
+          })
+        }
+        .padding({ top: px2vp(this.topRectHeight), bottom: px2vp(this.bottomRectHeight) })
       }
       .indicator(
         new DotIndicator()
@@ -508,21 +581,6 @@ export struct Player {
           this.tabPageIndex = target
         })
       })
-
-      Column() {
-        this.SliderContent()
-        this.ControllButtons()
-        Row({ space: 15 }) {
-          if(this.isLocalFile || this.playmode == 0) { Text('本地文件播放中').fontSize(10).fontColor(Color.Gray) }
-          if(this.isTimerWorking) { Text('已设置定时关闭').fontSize(10).fontColor(Color.Gray) }
-        }
-        .height(30)
-      }
-      .constraintSize({
-        minWidth: 0,
-        maxWidth: 500
-      })
-      .width('100%')
     }
     .height('100%')
     .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP])
@@ -536,18 +594,6 @@ export struct Player {
         }
         .width(this.deviceType === resourceManager.DeviceType.DEVICE_TYPE_TABLET ? '80%' : '90%')
         .height('100%')
-        .layoutWeight(1)
-
-        Column() {
-          this.SliderContent()
-          this.ControllButtons()
-          Row({ space: 15 }) {
-            if(this.isLocalFile || this.playmode == 0) { Text('本地文件播放中').fontSize(10).fontColor(Color.Gray) }
-            if(this.isTimerWorking) { Text('已设置定时关闭').fontSize(10).fontColor(Color.Gray) }
-          }
-          .visibility(this.isLocalFile || this.playmode == 0 || this.isTimerWorking ? Visibility.Visible : Visibility.Hidden)
-        }
-        .width(this.deviceType === resourceManager.DeviceType.DEVICE_TYPE_TABLET ? '80%' : '90%')
       }
       .layoutWeight(1)
 
@@ -561,14 +607,15 @@ export struct Player {
     .onAppear(() => { this.tabPageIndex = 0 })
   }
 
-  @Builder PhoneLargeUI() {
+  @Builder PhoneLandscapeUI() {
     Column() {
       Row() {
         Column() {
-          this.PhoneLargeSongInfo()
+          this.PhoneLandscapeInfo()
+
+          this.PhoneLandscapeSlider()
 
           Column() {
-            this.SliderContent(true)
             Row() {
               LoopModeButton({ imgWidth: 20, btnWidth: 20, imgColor: Color.White }).opacity(0.8)
               this.PlayButton(35)
