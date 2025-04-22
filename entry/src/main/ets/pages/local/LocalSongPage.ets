@@ -9,6 +9,14 @@ import RelationalStoreUtils from '../../common/utils/data/RelationalStoreUtils';
 import { LazyData } from '@pie/lazy-data';
 import { PickerUtil } from '@pura/picker_utils';
 import { EmitterConstants } from '../../common/constants/EmitterConstants';
+import { PlayAllButton } from '../../components/buttons/PlayAllButton';
+import PlayQueueUtils from '../../common/utils/play/PlayQueueUtils';
+import { Song } from '../../common/entities/song/Song';
+import { fetchMetadata, getArtists } from '../../common/functions/common/convert';
+import { getLocalSongArtists } from '../../common/functions/common/get';
+import { AlbumItem } from '../../common/entities/song/Album';
+import { playQueue } from '../../common/functions/play/playControl';
+import { PlayQueue } from '../../common/entities/local/PlayQueue';
 
 /**
  * 缓存管理页
@@ -79,6 +87,27 @@ export struct LocalSongPage {
     EmitterUtil.unSubscribe(EmitterConstants.REFRESH_LOCALSONGS)
   }
 
+  private handlePlayAll = async () => {
+    let playSongs: PlayQueue[] = []
+    for(let localSong of this.localSongs) {
+      try {
+        const rootUrl = FileUtils.getFilesDir()
+        const fileUrl = rootUrl + `/${localSong.songFile}`
+        const metadata = await fetchMetadata(fileUrl)
+        let artists = await getLocalSongArtists(localSong.artists)
+        let song: Song = { id: localSong.songId, name: localSong.name, artists: artists, album: AlbumItem,
+          duration: metadata ? ((metadata.duration) ? parseInt(metadata.duration) : 0) : 0, alias: [], fee: 0
+        }
+        playSongs.push({ playmode: 0, song: song, fileName: localSong.songFile, picUrl: '' })
+      } catch (e) {
+        LogUtil.error('Add LocalSong Error: ' + e.message)
+      }
+    }
+    await PlayQueueUtils.cleanQueue()
+    await PlayQueueUtils.queueAdd_array(playSongs)
+    playQueue(0)
+  }
+
   build() {
     NavDestination() {
       Stack({ alignContent: Alignment.Bottom }) {
@@ -118,8 +147,13 @@ export struct LocalSongPage {
                 GridItem() {
                   if (this.localSongs.length > 0) {
                     Row() {
-                      Text(this.isSelecting ? `已选 ${this.selectedSongs.length} 项` : `共 ${this.localSongs.length} 首歌曲`)
-                        .fontSize(Constants.FONT_SIZE_COMMON)
+                      if(this.isSelecting) {
+                        Text(`已选 ${this.selectedSongs.length} 项`)
+                          .fontSize(Constants.FONT_SIZE_COMMON)
+                          .padding({ left: Constants.PADDING_MEDIUM })
+                      } else {
+                        PlayAllButton({ count: this.localSongs.length, clickAction: this.handlePlayAll})
+                      }
                       Row({ space: 20 }) {
                         if(!this.isSelecting) {
                           // Image($r('app.media.ic_files_name_drive'))
@@ -167,6 +201,7 @@ export struct LocalSongPage {
                       }
                       .height(30)
                     }
+                    .height(30)
                     .justifyContent(FlexAlign.SpaceBetween)
                     .width('100%')
                   }
@@ -243,8 +278,9 @@ export struct LocalSongPage {
   }
 
   private async refreshList() {
-    this.localSongs = (await RelationalStoreUtils.getAllSongs()).reverse()
-    this.originalOrderList = [...this.localSongs]
+    this.localSongs = await RelationalStoreUtils.getAllSongs()
+    this.originalOrderList = this.localSongs
+    this.localSongs.reverse()
     this.isSelecting = false
     this.selectedSongs = []
     this.dataSource.setData(this.localSongs)
