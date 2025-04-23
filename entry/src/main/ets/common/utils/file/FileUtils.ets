@@ -96,18 +96,23 @@ class FileUtils {
     }
   }
 
-  async saveFile(localSongs: LocalSong[], type: 'song' | 'lyric' = 'song') {
+  async saveFile(localSongs: LocalSong[], type: 'song' | 'lyric' | 'img' = 'song') {
     try {
       let filePicker = new picker.DocumentViewPicker()
       let saveOption = new picker.DocumentSaveOptions()
-      if(type === 'song') saveOption.newFileNames = localSongs.map(song => song.songFile)
-      else saveOption.newFileNames = localSongs.map(song => `${song.songFile.replace(/\.[^.]+$/, '')}.lrc`)
+      if(type === 'song')
+        saveOption.newFileNames = localSongs.map(song => song.songFile)
+      else if(type === 'lyric')
+        saveOption.newFileNames = localSongs.map(song => `${song.songFile.replace(/\.[^.]+$/, '')}.lrc`)
+      else saveOption.newFileNames = localSongs.map(song => `${song.songFile.replace(/\.[^.]+$/, '')}.jpg`)
       filePicker.save(saveOption).then((uris) => {
         uris.forEach(async (uri, index) => {
           try {
             let fileName: string = type === 'song'
-            ? `/${localSongs[index].songFile}`
-              : `/lyric/${localSongs[index].songId}.lrc`
+            ? `/${localSongs[index].songFile}` :
+              type === 'lyric'
+            ? `/lyric/${localSongs[index].songId}.lrc`
+                : `/pic/${localSongs[index].songId}.jpg`
 
             let srcPath = this.filesDir + fileName
             let descFile = fs.openSync(uri, fs.OpenMode.READ_WRITE | fs.OpenMode.CREATE)

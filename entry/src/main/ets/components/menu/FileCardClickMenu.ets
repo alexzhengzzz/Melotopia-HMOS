@@ -86,15 +86,21 @@ export struct FileCardClickMenu {
           this.showMatchSheet = true
         })
 
-      MenuItem(this.MenuItem($r('app.media.ic_public_folder_filled'), '导出音频文件'))
+      MenuItem(this.MenuItem($r('app.media.ic_public_albums_filled'), '导出封面图片'))
+        .visibility(this.localSong.songId > 0 ? Visibility.Visible : Visibility.None)
         .onClick(() => {
-          FileUtils.saveFile([this.localSong])
+          FileUtils.saveFile([this.localSong], 'img')
         })
 
       MenuItem(this.MenuItem($r('app.media.ic_music_fill'), '导出歌词文件'))
         .visibility(this.localSong.songId > 0 ? Visibility.Visible : Visibility.None)
         .onClick(() => {
           FileUtils.saveFile([this.localSong], 'lyric')
+        })
+
+      MenuItem(this.MenuItem($r('app.media.ic_public_folder_filled'), '导出音频文件'))
+        .onClick(() => {
+          FileUtils.saveFile([this.localSong])
         })
 
       MenuItem(this.MenuItem($r('app.media.ic_public_delete_filled'), '删除歌曲', $r('app.color.app_red')))
