@@ -16,27 +16,24 @@ import { PlayListSkeleton } from '../../components/skeleton/Skeleton'
  * 每日推荐歌单页面
  */
 
-const TAG = '[DailyListPage] '
+const TAG = 'DailyListPage'
 
 @Component
 export struct DailyListPage {
-  @StorageProp('bottomRectHeight') bottomRectHeight: number = 0
-  @StorageProp('topRectHeight') topRectHeight: number = 0
+  @StorageProp(StorageConstants.BOTTOM_RECT_HEIGHT) bottomRectHeight: number = 0
+  @StorageProp(StorageConstants.TOP_RECT_HEIGHT) topRectHeight: number = 0
   @StorageProp(StorageConstants.BREAKPOINT_WIDTH) breakpoint: string = 'sm'
   @State list: DailySongRes[] = new Array()
-  @State hasLoaded: boolean = false
   @State isLoading: boolean = true
   @State pageOpacity: number = 1
   @State totayDate: string = ''
 
   async aboutToAppear() {
-    if(!this.hasLoaded) {
-      await this.loadSongs()
-      this.hasLoaded = true
-    }
-
     let date = new Date()
     this.totayDate = `${date.toDateString()}`
+    setTimeout(async () => {
+      await this.loadSongs()
+    }, 500)
   }
 
   async loadSongs(): Promise<void> {
@@ -76,9 +73,7 @@ export struct DailyListPage {
           }
           if(this.isLoading) {
             ForEach(Constants.ARRAY_LENGTH_10, (index: number) => {
-              ListItem() {
-                PlayListSkeleton()
-              }
+              PlayListSkeleton()
             })
           } else {
             ListItem() {

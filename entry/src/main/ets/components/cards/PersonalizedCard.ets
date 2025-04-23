@@ -42,7 +42,9 @@ export struct PersonalizedCard {
       param: playlistParam,
       remove: true
     }
-    EmitterUtil.post(EmitterConstants.PUSH_PAGE, param)
+    setTimeout(() => {
+      EmitterUtil.post(EmitterConstants.PUSH_PAGE, param)
+    }, 200)
   }
 
   build() {

@@ -17,6 +17,7 @@ import RelationalStoreUtils from "../utils/data/RelationalStoreUtils";
 import { FileCard } from "../../components/cards/FileCard";
 import { PickerUtil } from "@pura/picker_utils";
 import FileUtils from "../utils/file/FileUtils";
+import { LazyData } from "@pie/lazy-data";
 
 @Component
 export struct Explore {
@@ -39,6 +40,7 @@ export struct Explore {
   @Prop currentHour: number = 0
   @State totalOpacity: number = 0
   @State isShowApiSettings: boolean = false
+  @State ds_personalized: LazyData<PersonalListItem> = new LazyData()
   @Consume('pageInfos') pageInfos: NavPathStack
   private refreshCooldown: number = 5000
 
@@ -76,9 +78,12 @@ export struct Explore {
     if(this.isLogged && this.personalizedList.length == 0 && this.validApiUrl) {
       this.isLoadingPersonalized = true
       this.personalizedList = await getPersonalizedList()
-      this.isLoadingPersonalized = false
+      this.ds_personalized.setData(this.personalizedList)
+      setTimeout(() => { this.isLoadingPersonalized = false }, 100)
     }
-    else return
+    else {
+      this.ds_personalized.setData(this.personalizedList)
+    }
   }
 
   private refreshContent = async () => {
@@ -94,13 +99,14 @@ export struct Explore {
           this.topList = await getTopList(),
           this.personalizedList = await getPersonalizedList(),
         ])
+        this.ds_personalized.setData(this.personalizedList)
         this.lastRefreshTime = currentTime
         ToastUtil.showToast('刷新成功')
       } catch (e) {
         ToastUtil.showToast('内容刷新失败: ' + e.message)
       }
     }
-    this.isRefreshing = false
+    setTimeout(() => { this.isRefreshing = false }, 100)
   }
 
   build() {
@@ -147,7 +153,7 @@ export struct Explore {
                       PersonalizedSkeletion()
                     })
                   } else {
-                    ForEach(this.personalizedList, (item: PersonalListItem, index) => {
+                    LazyForEach(this.ds_personalized, (item: PersonalListItem, index) => {
                       PersonalizedCard({ item: item }).padding(5)
                     }, (item: PersonalListItem) => item.id.toString())
                   }
