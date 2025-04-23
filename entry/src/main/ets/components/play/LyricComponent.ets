@@ -27,7 +27,7 @@ export struct LyricComponent {
   async aboutToAppear(): Promise<void> {
     await this.getLyric()
     setTimeout(() => {
-      this.scroller.scrollToIndex(this.currentLyricIndex, false, ScrollAlign.CENTER)
+      this.scroller.scrollToIndex(this.currentLyricIndex + 1, false, ScrollAlign.CENTER)
     }, 10)
     this.StartAutoScrollTimer()
 
@@ -63,7 +63,7 @@ export struct LyricComponent {
 
   ToCurrentLyric() {
     if(!this.userScrolling) {
-      this.scroller.scrollToIndex(this.currentLyricIndex, true, ScrollAlign.CENTER)
+      this.scroller.scrollToIndex(this.currentLyricIndex + 1, true, ScrollAlign.CENTER)
       this.currentListIndex = this.currentLyricIndex
     }
   }
@@ -78,6 +78,7 @@ export struct LyricComponent {
         .width('100%')
         .layoutWeight(1)
       } else {
+        ListItem().height('30%')
         LazyForEach(this.dataSource, (item: Lyric, index) => {
           LyricLine({
             lyricStyle: this.lyricStyle,
@@ -94,7 +95,7 @@ export struct LyricComponent {
           })
           .animation({
             delay: this.userScrolling ? 0 : this.Delay(index),
-            duration: this.userScrolling ? 0 : 500,
+            duration: 500,
             curve: Curve.Smooth,
             expectedFrameRateRange: {
               expected: 90,
@@ -103,6 +104,7 @@ export struct LyricComponent {
             }
           })
         })
+        ListItem().height('30%')
       }
     }
     .cachedCount(5)
@@ -111,9 +113,7 @@ export struct LyricComponent {
     .width('100%')
     .height('100%')
     .edgeEffect(EdgeEffect.Spring)
-    .scrollSnapAlign(ScrollSnapAlign.CENTER)
     .listDirection(Axis.Vertical)
-    .cachedCount(20)
     .scrollBar(BarState.Off)
     .fadingEdge(true, {
       fadingEdgeLength: {
@@ -142,8 +142,8 @@ export struct LyricComponent {
   Delay(index: number) {
     if(this.userScrolling) return 0
     const delta = index - this.currentLyricIndex
-    if(delta > 10) return 10 * 80
-    return Math.max(delta * 80, 0)
+    if(delta > 10) return 10 * 60
+    return Math.max(delta * 60, 0)
   }
 
 }
@@ -170,10 +170,13 @@ struct LyricLine {
       .lineHeight(this.lyricStyle.size * 1.3)
       .fontColor(Color.White)
       .opacity(this.index == this.currentLyricIndex ? 1 : 0.35)
-      .fontWeight(FontWeight.Bolder)
+      .fontWeight(Constants.FONT_WEIGHT_BOLD)
       .textAlign(this.lyricStyle.align === 'center' ? TextAlign.Center : TextAlign.Start)
       .clickEffect({ level: ClickEffectLevel.LIGHT, scale: 0.9 })
       .padding({ left: 20, right: 20 })
+      .scale(this.index === this.currentLyricIndex ?
+        { x: 1.0, y: 1.0, centerX: this.lyricStyle.align === 'center' ? '50%' : 0 } :
+        { x: 0.9, y: 0.9, centerX: this.lyricStyle.align === 'center' ? '50%' : 0 })
       .onClick(() => {
         seekMusic(this.item.time + 100)
         setTimeout(() => {
@@ -181,7 +184,7 @@ struct LyricLine {
         }, 100)
       })
       .animation({
-        duration: this.userScrolling ? 0 :300,
+        duration: 500,
         curve: Curve.Smooth
       })
   }

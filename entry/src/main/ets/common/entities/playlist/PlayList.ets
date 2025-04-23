@@ -1,7 +1,7 @@
 /**
  * 歌单类
  */
-interface Creator {
+export interface Creator {
   userId: number
   nickname: string
   avatarUrl: string
